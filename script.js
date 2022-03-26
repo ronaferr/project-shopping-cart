@@ -44,5 +44,10 @@ function createCartItemElement({ sku, name, salePrice }) {
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
-
-window.onload = () => {fetchProducts(); };
+const xablau = async () => {
+  const retornoFuncao = await fetchProducts('computador');
+  const resultado = retornoFuncao.results;
+  resultado.forEach((produto) => createProductItemElement(produto));
+};
+xablau();
+window.onload = () => { };
