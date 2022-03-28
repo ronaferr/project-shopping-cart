@@ -21,19 +21,36 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
-function cartItemClickListener({ path }) {
-  // coloque seu código aqui
-  const [li] = path;
-  li.remove();
+function cartItemClickListener(dado) {
+  dado.remove();
 }
+
+const adcValor = async (valor) => {
+  const price = await valor;
+  const conatnierCart = document.querySelector('.cart');
+  const boxValor = document.querySelector('.total-price');
+  boxValor.innerHTML = price;
+  conatnierCart.appendChild(boxValor);
+};
+
+const valorAtual = [];
+const totalPrice = async (valor) => {
+  await valorAtual.push(valor);
+  const total = valorAtual.reduce((acc, element) => acc + element);
+  adcValor(total);
+};
 
 function createCartItemElement({ id, title, price }) {
   const ol = document.querySelector('.cart__items');
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
+  totalPrice(price);
   ol.appendChild(li);
-  li.addEventListener('click', cartItemClickListener);
+  li.addEventListener('click', () => {
+    // const a = price;
+    cartItemClickListener(li);
+  });
   return li;
 }
 
@@ -46,9 +63,9 @@ function createProductItemElement({ id, title, thumbnail }) {
   section.appendChild(createProductImageElement(thumbnail));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'))
     .addEventListener('click', async () => {
-   const a = await fetchItem(getSkuFromProductItem(section));
-   createCartItemElement(a);
-  });
+      const a = await fetchItem(getSkuFromProductItem(section));
+      createCartItemElement(a);
+    });
   adcItemList(section);
   return section;
 }
@@ -59,5 +76,11 @@ const xablau = async () => {
   resultado.forEach((produto) => createProductItemElement(produto));
 };
 xablau();
-window.onload = () => { 
+
+window.onload = () => {
+  const btnClear = document.querySelector('.empty-cart');
+  const listCart = document.querySelector('.cart__items');
+  btnClear.addEventListener('click', () => {
+    listCart.innerText = '';
+  });
 };
