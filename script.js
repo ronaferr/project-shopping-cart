@@ -1,3 +1,11 @@
+// criação de mensagem de carregamento
+const containerMae = document.querySelector('.container');
+const novaDiv = document.createElement('span');
+novaDiv.className = 'loading';
+novaDiv.innerText = 'carregando...';
+console.log(novaDiv);
+containerMae.appendChild(novaDiv);
+
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -74,6 +82,7 @@ const xablau = async () => {
   const retornoFuncao = await fetchProducts('computador');
   const resultado = retornoFuncao.results;
   resultado.forEach((produto) => createProductItemElement(produto));
+  containerMae.removeChild(novaDiv); // remoção de mensagem após carregamento de fetch
 };
 xablau();
 
