@@ -3,7 +3,6 @@ const containerMae = document.querySelector('.container');
 const novaDiv = document.createElement('span');
 novaDiv.className = 'loading';
 novaDiv.innerText = 'carregando...';
-console.log(novaDiv);
 containerMae.appendChild(novaDiv);
 
 function createProductImageElement(imageSource) {
@@ -29,23 +28,23 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
-function cartItemClickListener(dado) {
-  dado.remove();
+function cartItemClickListener({ path }) {
+  const [li] = path;
+  li.remove();
 }
 
+const boxValor = document.querySelector('.total-price');
+const total = 0;
 const adcValor = async (valor) => {
   const price = await valor;
-  const conatnierCart = document.querySelector('.cart');
-  const boxValor = document.querySelector('.total-price');
-  boxValor.innerHTML = price;
-  conatnierCart.appendChild(boxValor);
+  boxValor.innerText = total + price;
 };
 
 const valorAtual = [];
 const totalPrice = async (valor) => {
   await valorAtual.push(valor);
-  const total = valorAtual.reduce((acc, element) => acc + element);
-  adcValor(total);
+  const soma = valorAtual.reduce((acc, element) => acc + element);
+  adcValor(soma);
 };
 
 function createCartItemElement({ id, title, price }) {
@@ -55,10 +54,7 @@ function createCartItemElement({ id, title, price }) {
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
   totalPrice(price);
   ol.appendChild(li);
-  li.addEventListener('click', () => {
-    // const a = price;
-    cartItemClickListener(li);
-  });
+  li.addEventListener('click', cartItemClickListener);
   return li;
 }
 
@@ -83,13 +79,16 @@ const xablau = async () => {
   const resultado = retornoFuncao.results;
   resultado.forEach((produto) => createProductItemElement(produto));
   containerMae.removeChild(novaDiv); // remoção de mensagem após carregamento de fetch
+  getSavedCartItems();
 };
 xablau();
 
 window.onload = () => {
+  // função para limpar carrinho
   const btnClear = document.querySelector('.empty-cart');
   const listCart = document.querySelector('.cart__items');
   btnClear.addEventListener('click', () => {
     listCart.innerText = '';
   });
+  // fazer backup do carrinho
 };
