@@ -5,6 +5,8 @@ novaDiv.className = 'loading';
 novaDiv.innerText = 'carregando...';
 containerMae.appendChild(novaDiv);
 
+const ol = document.querySelector('.cart__items');
+
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -33,27 +35,12 @@ function cartItemClickListener({ path }) {
   li.remove();
 }
 
-const boxValor = document.querySelector('.total-price');
-const total = 0;
-const adcValor = async (valor) => {
-  const price = await valor;
-  boxValor.innerText = total + price;
-};
-
-const valorAtual = [];
-const totalPrice = async (valor) => {
-  await valorAtual.push(valor);
-  const soma = valorAtual.reduce((acc, element) => acc + element);
-  adcValor(soma);
-};
-
 function createCartItemElement({ id, title, price }) {
-  const ol = document.querySelector('.cart__items');
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
-  totalPrice(price);
   ol.appendChild(li);
+  saveCartItems(ol.innerHTML);
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
@@ -73,22 +60,31 @@ function createProductItemElement({ id, title, thumbnail }) {
   adcItemList(section);
   return section;
 }
-
-const xablau = async () => {
+// função para buscar lista de produtos da API para jogar no site
+const findProductsList = async () => {
   const retornoFuncao = await fetchProducts('computador');
   const resultado = retornoFuncao.results;
   resultado.forEach((produto) => createProductItemElement(produto));
   containerMae.removeChild(novaDiv); // remoção de mensagem após carregamento de fetch
-  getSavedCartItems();
 };
-xablau();
+findProductsList();
+
+// pegar itens do local storage de colocar no carrinho
+const itensSalvos = async () => {
+  const item = await getSavedCartItems();
+  ol.innerHTML = item;
+  const itemsalvo = Array.from(ol.children);
+  itemsalvo.forEach((product) => {
+    product.addEventListener('click', cartItemClickListener);
+  });
+};
 
 window.onload = () => {
+  itensSalvos();
   // função para limpar carrinho
   const btnClear = document.querySelector('.empty-cart');
   const listCart = document.querySelector('.cart__items');
   btnClear.addEventListener('click', () => {
     listCart.innerText = '';
   });
-  // fazer backup do carrinho
 };

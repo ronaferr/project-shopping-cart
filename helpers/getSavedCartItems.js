@@ -1,7 +1,7 @@
-const getSavedCartItems = () => {
+const getSavedCartItems = async () => {
   // seu código aqui
-  // const ol = document.querySelector('.cart__items');
-  const backup = localStorage.getItem('cartItems');
+  const backup = await localStorage.getItem('cartItems');
+  return backup;
 };
 if (typeof module !== 'undefined') {
   module.exports = getSavedCartItems;
