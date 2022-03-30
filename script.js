@@ -6,6 +6,7 @@ novaDiv.innerText = 'carregando...';
 containerMae.appendChild(novaDiv);
 
 const ol = document.querySelector('.cart__items');
+let total = 0; // valor inicial do carrinho
 
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
@@ -30,9 +31,29 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
+const sectionTotal = document.querySelector('.total-price');
+sectionTotal.innerHTML = total;
+const totalCarrinho = async (value) => {
+  const valor = await value;
+  const a = valor.lastIndexOf('$');
+  const b = parseFloat(valor.substr(a + 1));
+  total += b;
+  /* if (total % 1 === 0){
+    sectionTotal.innerHTML = total
+  } else { */
+  sectionTotal.innerHTML = total;
+};
+
 function cartItemClickListener({ path }) {
   const [li] = path;
   li.remove();
+  const testando = Array.from(ol.children);
+  total = 0;
+  testando.forEach((product) => {
+    totalCarrinho(product.innerText);
+  });
+  localStorage.removeItem('cartItems');
+  saveCartItems(ol.innerHTML);
 }
 
 function createCartItemElement({ id, title, price }) {
@@ -41,6 +62,7 @@ function createCartItemElement({ id, title, price }) {
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
   ol.appendChild(li);
   saveCartItems(ol.innerHTML);
+  totalCarrinho(ol.innerText);
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
@@ -71,10 +93,12 @@ findProductsList();
 
 // pegar itens do local storage de colocar no carrinho
 const itensSalvos = async () => {
+  const olStorage = document.querySelector('.cart__items');
   const item = await getSavedCartItems();
-  ol.innerHTML = item;
-  const itemsalvo = Array.from(ol.children);
+  olStorage.innerHTML = item;
+  const itemsalvo = Array.from(olStorage.children);
   itemsalvo.forEach((product) => {
+    totalCarrinho(product.innerText);
     product.addEventListener('click', cartItemClickListener);
   });
 };
@@ -83,8 +107,10 @@ window.onload = () => {
   itensSalvos();
   // função para limpar carrinho
   const btnClear = document.querySelector('.empty-cart');
-  const listCart = document.querySelector('.cart__items');
   btnClear.addEventListener('click', () => {
-    listCart.innerText = '';
+    ol.innerText = '';
+    localStorage.removeItem('cartItems');
+    total = 0;
+    sectionTotal.innerHTML = total;
   });
 };
