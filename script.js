@@ -5,7 +5,7 @@ novaDiv.className = 'loading';
 novaDiv.innerText = 'carregando...';
 containerMae.appendChild(novaDiv);
 
-const ol = document.querySelector('.cart__items');
+const ol = document.querySelector('.cart__items'); // buscando lista do carrinho
 let total = 0; // valor inicial do carrinho
 
 function createProductImageElement(imageSource) {
@@ -21,7 +21,7 @@ function createCustomElement(element, className, innerText) {
   e.innerText = innerText;
   return e;
 }
-
+// função para adicionar produtos no catalago
 function adcItemList(item) {
   const mae = document.querySelector('.items');
   mae.appendChild(item);
@@ -30,29 +30,26 @@ function adcItemList(item) {
 function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
-
+// buscando elemento que será armazenado valor total
 const sectionTotal = document.querySelector('.total-price');
 sectionTotal.innerHTML = total;
-const totalCarrinho = async (value) => {
+const totalCarrinho = async (value) => { // função para somar itens do carrinho
   const valor = await value;
   const a = valor.lastIndexOf('$');
   const b = parseFloat(valor.substr(a + 1));
   total += b;
-  /* if (total % 1 === 0){
-    sectionTotal.innerHTML = total
-  } else { */
   sectionTotal.innerHTML = total;
 };
-
-function cartItemClickListener({ path }) {
-  const [li] = path;
+// função para remover item da lista
+function cartItemClickListener({ path }) { // destruturando objeto para encontrar elemento onde contem lista
+  const [li] = path; // destruturando array para encontrar lista
   li.remove();
-  const testando = Array.from(ol.children);
+  const testando = Array.from(ol.children); // transformando obj lista em array, armazendo o zero antes de passar por cada item e fazer o subtotal
   total = 0;
   testando.forEach((product) => {
     totalCarrinho(product.innerText);
   });
-  localStorage.removeItem('cartItems');
+  localStorage.removeItem('cartItems'); // remover o localstorage e adc o novo
   saveCartItems(ol.innerHTML);
 }
 
@@ -60,9 +57,9 @@ function createCartItemElement({ id, title, price }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
-  ol.appendChild(li);
-  saveCartItems(ol.innerHTML);
-  totalCarrinho(ol.innerText);
+  ol.appendChild(li); // adc item em lista
+  saveCartItems(ol.innerHTML); // salvar item no localstorage
+  totalCarrinho(ol.innerText); // fazer a soma dos valores
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
@@ -75,7 +72,7 @@ function createProductItemElement({ id, title, thumbnail }) {
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'))
-    .addEventListener('click', async () => {
+    .addEventListener('click', async () => { // função ao clicar no botão para adcionar item para carrinho
       const a = await fetchItem(getSkuFromProductItem(section));
       createCartItemElement(a);
     });
@@ -96,7 +93,7 @@ const itensSalvos = async () => {
   const olStorage = document.querySelector('.cart__items');
   const item = await getSavedCartItems();
   olStorage.innerHTML = item;
-  const itemsalvo = Array.from(olStorage.children);
+  const itemsalvo = Array.from(olStorage.children); // fazer o subtotal dos produtos do localstorage
   itemsalvo.forEach((product) => {
     totalCarrinho(product.innerText);
     product.addEventListener('click', cartItemClickListener);
